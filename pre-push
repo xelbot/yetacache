@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+echo -e "\e[36mStart pre-push hook\e[0m\n"
+
+go test ./...
+
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    echo -e "\n\e[31mgo test error\e[0m\n"
+    exit 1
+else
+    echo -e "\n\e[32mgo test OK\e[0m\n"
+fi
+
+exit 0
+

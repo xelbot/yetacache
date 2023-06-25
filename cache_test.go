@@ -79,3 +79,24 @@ func TestClearMethod(t *testing.T) {
 
 	c.StopCleanup()
 }
+
+func TestCustomTTL(t *testing.T) {
+	c := New[int, int](time.Millisecond, time.Second)
+	c.Set(27, 1, DefaultTTL)
+	c.Set(48, 1, 2*time.Millisecond)
+
+	if !c.Has(27) || !c.Has(48) {
+		t.Error("Not found value that should exist")
+	}
+
+	time.Sleep(1010 * time.Microsecond)
+
+	if c.Has(27) {
+		t.Error("Found value that should have expired")
+	}
+	if !c.Has(48) {
+		t.Error("Not found value that shouldn't expired")
+	}
+
+	c.StopCleanup()
+}
