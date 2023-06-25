@@ -47,7 +47,7 @@ func (c *Cache[K, V]) Has(id K) bool {
 
 	item, found := c.items[id]
 	if found {
-		return time.Now().Unix() < item.expiresAt
+		return time.Now().UnixMicro() < item.expiresAt
 	}
 
 	return false
@@ -65,7 +65,7 @@ func (c *Cache[K, V]) Get(id K) (V, bool) {
 	if found {
 		val = item.item
 
-		return val, time.Now().Unix() < item.expiresAt
+		return val, time.Now().UnixMicro() < item.expiresAt
 	}
 
 	return val, false
@@ -84,7 +84,7 @@ func (c *Cache[K, V]) Set(id K, value V, ttl time.Duration) {
 
 	c.items[id] = cacheItem[V]{
 		item:      value,
-		expiresAt: time.Now().Add(ttl).Unix(),
+		expiresAt: time.Now().Add(ttl).UnixMicro(),
 	}
 }
 
@@ -126,7 +126,7 @@ func (c *Cache[K, V]) cleanupLoop(interval time.Duration) {
 			return
 		case <-ticker.C:
 			c.locker.Lock()
-			now = time.Now().Unix()
+			now = time.Now().UnixMicro()
 			for key, item := range c.items {
 				if now > item.expiresAt {
 					delete(c.items, key)
